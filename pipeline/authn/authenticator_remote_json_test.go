@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -181,7 +180,7 @@ func makeServiceServer(statusCode int, responseBody string) (*httptest.Server, *
 	requestRecorder := &RemoteJSONRequestRecorder{}
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestRecorder.requests = append(requestRecorder.requests, r)
-		requestBody, _ := ioutil.ReadAll(r.Body)
+		requestBody, _ := io.ReadAll(r.Body)
 		requestRecorder.bodies = append(requestRecorder.bodies, requestBody)
 		w.WriteHeader(statusCode)
 		w.Write([]byte(responseBody))
@@ -193,7 +192,7 @@ func makeRemoteJSONRequest(method string, path string, headers map[string]string
 	var body io.ReadCloser
 	header := http.Header{}
 	if bodyStr != "" {
-		body = ioutil.NopCloser(bytes.NewBufferString(bodyStr))
+		body = io.NopCloser(bytes.NewBufferString(bodyStr))
 		header.Add("Content-Length", strconv.Itoa(len(bodyStr)))
 	}
 	req := &http.Request{
